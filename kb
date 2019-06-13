@@ -1,0 +1,33 @@
+HOLBMAC0212:sid-terraform andrew.boxer$ cat ~/.ssh/configs/id1-main.configs
+StrictHostKeyChecking no
+UserKnownHostsFile /dev/null
+User andrew.boxer
+IdentityFile /Users/andrew.boxer/.ssh/id_rsa
+
+Host bastion
+  #Hostname bastion.main.nonprod.js-identity.services
+  Hostname sandbox.main.nonprod.js-identity.services
+  ProxyCommand none
+  ForwardAgent yes
+
+Host *
+  ProxyCommand ssh -F /Users/andrew.boxer/.ssh/configs/id1-main.cfg -o ControlMaster=auto -o ControlPersist=60s bastion nc -q0 %h %p
+
+
+  file 2:
+HOLBMAC0212:sid-terraform andrew.boxer$ cat ~/bin/id1-ssh
+ssh -F ~/.ssh/configs/id1-${1}.cfg $2
+
+ile 3:
+HOLBMAC0212:sid-terraform andrew.boxer$ cat ~/bin/id1-fwd
+if [ -z "${4}" ]; then export lport=${3}; else lport=${4}; fi
+
+echo "Port forwarding to ${2} on port ${lport} starting..."
+
+ssh -N -L ${lport}:${2}:${3} -F ~/.ssh/configs/id1-${1}.cfg bastion
+
+
+
+
+
+
